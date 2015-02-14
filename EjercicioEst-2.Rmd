@@ -1,0 +1,109 @@
+---
+title: "Tarea 4"
+author: "Estefania cu: 126546
+         Ximena cu: 130849 "
+output: html_document
+---
+#Ejercicios 1 y 2
+```{r Ajustes, echo= FALSE}
+directorio<-"/Users/xime_xim/Desktop"
+
+```
+
+### Descripcion de los datos
+La informacion se obtuvo de la pagina del Banco de Mexico el dia 28 de agosto de 2014.
+```{r LecturaDatos}
+setwd(directorio)
+TC.Banxico <-read.table("./tipoCambioBanxico.txt",
+                        sep = "|" ,
+                        header=TRUE,
+                        stringsAsFactors = FALSE 
+                        )
+```
+### Transformacion de los datos
+```{r Transformacion}
+TC.Banxico$Fecha.DOF <- as.Date(TC.Banxico$Fecha.DOF,
+                                format="%d/%m/%Y")
+
+# Creo una columna con el a?o.
+temporal<-as.POSIXlt(TC.Banxico$Fecha.DOF)
+TC.Banxico$anio<- unclass(temporal)$year+1900
+```
+
+```{r filtro}
+TC.Banxico.existentes <- subset(TC.Banxico, TC !="N/E")
+TC.Banxico.existentes$TC <- as.numeric(TC.Banxico.existentes$TC)
+```
+
+###Grafica de los datos
+```{r grafica}
+par(mfrow=c (3,3), las = 1)
+
+for ( i in 2006:2014)
+{
+  tc<-subset(TC.Banxico.existentes, anio == i)
+
+hist(tc$TC,
+     breaks=seq(9.9, 15.4, length.out = 30),
+         col="blue",
+         border="white",
+         xlim = c(9.9, 15.4), 
+         ylim = c(0, 120),
+         main= as.character(i),
+         xlab= "Tipo de cambio del dolar de E.U.A.",
+         ylab= "Frecuencia")
+     media<- mean (tc$TC, na.rm = TRUE)
+     mediana<- median(tc$TC, na.rm=TRUE)
+      abline(v=media, col = "red", lwd=3)
+      abline(v=mediana, col = "black", lwd=3)
+}
+
+```
+
+
+#Ejercicio 3
+####Con base en la gr?fica anterior, describa el comportamiento del tipo de cambio en el periodo de observaci?n.
+####El comportamiento del tipo de cambio se encuentra entre 11 y 14 del periodo observado. Notese que del a?o 2008 al 2009 el cambio de la media es muy considerable.
+
+#Ejercicio 4
+```{r}
+par(mfrow = c(3,3), las = 1)
+for (i in 2006:2014){
+  dd <- subset(TC.Banxico.existentes, anio == i)
+ aaa <- c(TC.Banxico$anio)
+
+  boxplot(dd$TC, range = 0, 
+          varwidth = TRUE, 
+          main = as.character(i),
+          ylab = "tipo de cambio de Dolar E.U.",
+          ylab = c(0,30),
+          ylim= c(10,15)    
+          )
+}
+
+```
+#Ejercicio 5
+#### Podemos observar que la media en la mayoría de los casos a excepción del 2008 y 2009, el 50% de los datos estan cerca del tipo de cambio máximo, podemos observar que a excepción del 2011 el 50% de los datos estan cerca de la media, y en respecto a los histogramas, el diagrama de caja es un poco mas sencillo de leer, pues por la estructura que maneja, la mediana es mucho mas sencilla de ubicarla, así como las valores máximos y mínimos y como de distribuye el 50% de los datos. 
+
+
+#Ejercicio 6
+```{r Normal}
+normal <- function(x){
+    (1/(sqrt(2.0*pi)))*exp(-(1/2)*x^2)
+}
+curve(normal, 
+      main= expression(paste("Grafica de la funcion ", frac(1,sqrt(2*pi))%.%e^-frac(x^2,2))),
+      from =-4,
+      to=4,
+      xlab= "x",
+      ylab="f(x)",
+      col = "red",
+      las=1
+      )
+abline(v=0)
+points(0, normal(0), col="blue", pch=19)
+max<- data.frame(x=0, y=normal(0), etiqueta="Valor Maximo")
+text(max$x, max$y,max$etiqueta, pos=4, col = "black")
+
+```
+
